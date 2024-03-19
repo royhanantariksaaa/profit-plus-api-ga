@@ -1,0 +1,148 @@
+// Baru punya Tariff
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Define the "Product" table
+model Product {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  // Define relationships
+  packages  Package[]
+  types     Type[]
+  offerings Offering[]
+}
+
+// Define the "package" table
+model Package {
+  id               Int          @id @default(autoincrement())
+  name             String
+  category         CategoryEnum
+  target_sales     Int          @default(10)
+  payback_period   Int          @default(1)
+  operational_time Int          @default(12)
+  excess_capacity  Int          @default(0)
+  capex            Float        @default(0)
+  opex             Float        @default(0)
+  cogs             Float        @default(0)
+  tariff           Float        @default(0)
+  create_at        DateTime     @default(now())
+  update_at        DateTime     @updatedAt
+  delete_at        DateTime?
+
+  // Define relationships
+  product           Product            @relation(fields: [productId], references: [id])
+  productId         Int
+  Offering_Packages Offering_Package[]
+  Totals            Total[]
+}
+
+model Offering_Package {
+  package    Package  @relation(fields: [packageId], references: [id])
+  packageId  Int
+  offering   Offering @relation(fields: [offeringId], references: [id])
+  offeringId Int
+
+  @@id([packageId, offeringId])
+}
+
+// Define the "offering" table
+model Offering {
+  id         Int    @id @default(autoincrement())
+  offer_name String
+
+  // Define relationships
+  Offering_Packages Offering_Package[]
+  Product           Product            @relation(fields: [productId], references: [id])
+  productId         Int
+}
+
+// Define the "type" table
+model Type {
+  id   String   @id @default(uuid())
+  type TypeEnum
+
+  // Define relationships
+  product    Product    @relation(fields: [productId], references: [id])
+  productId  Int
+  categories Category[]
+  Totals     Total[]
+}
+
+// Define the "category" table
+model Category {
+  id       Int    @id @default(autoincrement())
+  typeId   String
+  category String
+
+  // Define relationships
+  type  Type   @relation(fields: [typeId], references: [id])
+  datas Data[]
+}
+
+// Define the "data" table
+model Data {
+  id           Int       @id @default(autoincrement())
+  quantity     Int
+  frequency    Int
+  unit         String
+  excess       Float
+  code         String
+  event_module String
+  grade        String
+  create_at    DateTime  @default(now())
+  update_at    DateTime  @updatedAt
+  delete_at    DateTime?
+
+  // Define relationships
+  category   Category     @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  components Components[]
+}
+
+// Define the "components" table
+model Components {
+  id           Int       @id @default(autoincrement())
+  name         String
+  item         String
+  unit         Int
+  specs        String
+  priceperunit Float
+  quantity     Int
+  create_at    DateTime  @default(now())
+  update_at    DateTime  @updatedAt
+  delete_at    DateTime?
+
+  // Define relationships
+  data   Data @relation(fields: [dataId], references: [id])
+  dataId Int
+}
+
+// Define the "total" table
+model Total {
+  package   Package @relation(fields: [packageId], references: [id])
+  packageId Int
+  type      Type    @relation(fields: [typeId], references: [id])
+  typeId    String
+  total     Float
+
+  @@id([packageId, typeId])
+}
+
+enum CategoryEnum {
+  MAIN_FEATURES
+  ADD_ON
+}
+
+enum TypeEnum {
+  CAPEX
+  OPEX
+  CoGS
+}
