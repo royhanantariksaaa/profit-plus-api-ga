@@ -30,9 +30,10 @@ jobs:
             npm install --omit=dev
             if pm2 list | grep profitplus; then
               echo "Process 'profitplus' already running with pm2."
-              pm2 restart 'profitplus'
+              pm2 restart 'profitplus' --update-env
             else
               echo "Process 'profitplus' not found with pm2."
-              pm2 start src/Main.js --name "profitplus"
+              pm2 start src/Main.js --name "profitplus" --update-env
             fi
+            pm2 save
             
