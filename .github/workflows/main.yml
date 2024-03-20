@@ -18,6 +18,7 @@ jobs:
             if [ -d ~/apps/profit-plus-api-ga/.git ]; then
               echo "Repository exists, pulling changes..."
               cd ~/apps/profit-plus-api-ga
+              git checkout
               git pull origin schema
             else
               echo "Repository not found, cloning..."
