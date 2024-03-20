@@ -7,16 +7,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps: 
-      - uses: actions/checkout@v2
-      - name: Check for existing repository
-        run: |
-          if [ -d ~/apps/profit-plus-api-ga/.git ]; then
-            echo "Repository exists, pulling changes..."
-          else
-            echo "Repository not found, cloning..."
-            cd ~/apps
-            git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
-          fi
       - name: Deploy using ssh
         uses: appleboy/ssh-action@master
         with:
@@ -25,8 +15,16 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT}}
           script: |
+            if [ -d ~/apps/profit-plus-api-ga/.git ]; then
+              echo "Repository exists, pulling changes..."
+              cd ~/apps/profit-plus-api-ga
+              git pull origin schema
+            else
+              echo "Repository not found, cloning..."
+              cd ~/apps
+              git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
+            fi
             cd ~/apps/profit-plus-api-ga
-            git pull origin schema
             git status
             npm install --omit=dev
             pm2 restart src/Main.js
