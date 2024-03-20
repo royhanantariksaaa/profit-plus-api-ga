@@ -28,4 +28,11 @@ jobs:
             cd ~/apps/profit-plus-api-ga
             git status
             npm install --omit=dev
-            pm2 restart src/Main.js --cwd ~/apps/profit-plus-api-ga
+            if pm2 list | grep profitplus; then
+              echo "Process 'profitplus' already running with pm2."
+              pm2 restart 'profitplus'
+            else
+              echo "Process 'profitplus' not found with pm2."
+              pm2 start src/Main.js --name "profitplus"
+            fi
+            
