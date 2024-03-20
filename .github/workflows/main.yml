@@ -1,31 +1,22 @@
 name: CD
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "schema" ]
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps: 
-      - name: Check if repository exists
-        id: repo_check
+      - uses: actions/checkout@v2
+      - name: Check for existing repository
         run: |
-          if [ -d "~/apps/profit-plus-api-ga" ]; then
-            echo "::set-output name=exists::true"
+          if [ -d ~/apps/profit-plus-api-ga/.git ]; then
+            echo "Repository exists, pulling changes..."
           else
-            echo "::set-output name=exists::false"
+            echo "Repository not found, cloning..."
+            cd ~/apps
+            git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
           fi
-        shell: bash
-
-      - name: Checkout repository
-        if: steps.repo_check.outputs.exists == 'false'
-        uses: actions/checkout@v2
-
-      - name: Update repository
-        if: steps.repo_check.outputs.exists == 'true'
-        run: |
-          cd path/to/your/repository
-          git pull origin schema
-
       - name: Deploy using ssh
         uses: appleboy/ssh-action@master
         with:
@@ -35,6 +26,7 @@ jobs:
           port: ${{ secrets.PORT}}
           script: |
             cd ~/apps/profit-plus-api-ga
+            git pull origin schema
             git status
             npm install --omit=dev
             pm2 restart src/Main.js
