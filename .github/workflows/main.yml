@@ -19,7 +19,7 @@ jobs:
               echo "Repository exists, pulling changes..."
               cd ~/apps/profit-plus-api-ga
               git checkout
-              git pull origin schema
+              git pull --rebase origin schema
             else
               echo "Repository not found, cloning..."
               cd ~/apps
