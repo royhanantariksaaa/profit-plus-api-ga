@@ -47,10 +47,11 @@ model users {
   units units @relation(fields: [unit_id], references: [unit_id])
   unit_id Int // foreign key of units
   levels levels @relation(fields: [level_id], references: [level_id]) // foreign key of levels
-  level_id Int
+  level_id Int  // foreign key of levels
   login_credentials login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id])
   login_credentials_id String @unique // foreign key of login_credentials
-  teams String
+  teams teams @relation(fields: [team_id], references: [team_id])
+  team_id Int //  Foreign key of teams
 }
 
 model login_credentials {
@@ -59,6 +60,12 @@ model login_credentials {
   RefreshToken RefreshToken[]
   email String
   password String
+}
+
+model teams {
+  team_id Int @id @default(autoincrement())
+  users users[]  //   1 to many relation with users
+  team_name String @unique
 }
 
 model RefreshToken {
@@ -84,7 +91,7 @@ model unit_leader {
 model levels {
   level_id Int @id @default(autoincrement())
   users users[]
-  name String
+  name String @unique
 }
 
 model taxonomy {
