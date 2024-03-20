@@ -18,16 +18,16 @@ jobs:
             if [ -d ~/apps/profit-plus-api-ga/.git ]; then
               echo "Repository exists, pulling changes..."
               cd ~/apps/profit-plus-api-ga
-              git checkout
-              git pull --rebase origin schema
+              sudo git checkout
+              sudo git pull --rebase origin schema
             else
               echo "Repository not found, cloning..."
               cd ~/apps
-              git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
+              sudo git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
             fi
             cd ~/apps/profit-plus-api-ga
             git status
-            npm install --omit=dev
+            sudo npm install --omit=dev
             sudo prisma generate --schema=./src/models/porto.prisma
             if pm2 list | grep profitplus; then
               echo "Process 'profitplus' already running with pm2."
