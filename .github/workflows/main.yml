@@ -31,7 +31,7 @@ jobs:
             git status
             sudo npm install --omit=dev
             sudo prisma generate --schema=./src/models/porto.prisma
-            sudo prisma migrate dev --schema=./src/models/porto.prisma
+            sudo prisma migrate deploy --schema=./src/models/porto.prisma
             if pm2 list | grep profitplus; then
               echo "Process 'profitplus' already running with pm2."
               pm2 restart 'profitplus' --update-env
