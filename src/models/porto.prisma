@@ -1,0 +1,252 @@
+// Database configuration properties
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// Database model mapping
+model product {
+  product_id Int @id @default(autoincrement())
+  units units @relation(fields: [unit_id], references: [unit_id])
+  taxonomy taxonomy @relation(fields: [taxonomy_id], references: [taxonomy_id])
+  category category @relation(fields: [category_id], references: [category_id])
+  category_id Int // Foreign Key of category
+  taxonomy_id Int // Foreign key of taxonomy
+  unit_id Int // Foreign key of unit
+  year Int
+  name String
+  branding String // store the directory of branding file
+  evidence_tariff String // Store the directory of tariff file
+  evidence_product String // Store the directory of product's evidence file
+  playbook String // Store the directory of product's playbook file
+  product_profile String
+  isActive Boolean
+  progressEnum progressEnum @default(aquisition)
+  stpdb stpdb[] // 1 to many relation with stpdb
+  product_services product_services[] // 1 to many relation with product_services
+  product_use_case product_use_case[] // 1 to many relation with product_use_case
+  operating_model operating_model[] // 1 to many relation with operating_model
+  segment_targeting segment_targeting[] // 1 to many relation with segment_targeting
+}
+
+model units {
+  unit_id Int @id @default(autoincrement())
+  users users[] // 1 to many relation with users
+  unit_leader unit_leader?  // 1 to 1 relation with unit_leader
+  product product[] // 1 to many relation with product
+  name String
+}
+
+model users {
+  user_id Int @id @default(autoincrement())
+  unit_leader unit_leader?  // 1 to 1 relation with unit_leader
+  units units @relation(fields: [unit_id], references: [unit_id])
+  unit_id Int // foreign key of units
+  levels levels @relation(fields: [level_id], references: [level_id]) // foreign key of levels
+  level_id Int
+  login_credentials login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id])
+  login_credentials_id String @unique // foreign key of login_credentials
+  teams String
+}
+
+model login_credentials {
+  login_credentials_id String @id @default(uuid())
+  users users?
+  RefreshToken RefreshToken[]
+  email String
+  password String
+}
+
+model RefreshToken {
+  id String @id @unique @default(uuid())
+  hashedToken String
+  userId String
+  login_credentials login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
+  login_credentials_id String
+  revoked Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Add new entity named unit_leader
+model unit_leader {
+  leader_id Int @id @default(autoincrement())
+  users users @relation(fields: [user_id], references: [user_id])
+  units units @relation(fields: [unit_id], references: [unit_id])
+  user_id Int @unique //  Foreign key of user
+  unit_id Int @unique // Foreign key of unit
+}
+
+model levels {
+  level_id Int @id @default(autoincrement())
+  users users[]
+  name String
+}
+
+model taxonomy {
+  taxonomy_id Int @id @default(autoincrement())
+  product product[] // 1 to many relation with product
+  name String
+  taxonomy_desc String
+}
+
+model category {
+  category_id Int @id @default(autoincrement())
+  product product[] // 1 to many relation with product
+  name String
+  category_desc String
+}
+
+enum progressEnum {
+  aquisition
+  activation
+  retention
+  referral
+  revenue
+}
+
+model differentiation {
+  dif_id Int @id @default(autoincrement())
+  dif_enabler_collection dif_enabler_collection[] //  1 to many relation with dif_enabler_collection
+  stpdb stpdb[]
+  content String
+  context String
+}
+
+model dif_enabler_collection {
+  dif_enabler_collection_id Int @id @default(autoincrement())
+  point_description String
+  differentiation differentiation @relation(fields: [dif_id], references: [dif_id])
+  dif_id Int // Foreign Key of differentiation
+}
+
+model stpdb {
+  stpdb_id Int @id @default(autoincrement())
+  product product @relation(fields: [product_id], references: [product_id])
+  differentiation differentiation @relation(fields: [dif_id], references: [dif_id])
+  product_id Int //  Foreign key of product
+  dif_id Int  //  Foreign key of differentiation
+  branding String //  Store the directory of product's branding image
+  positioning_description String
+  segment_targeting segment_targeting[] // 1 to many relation with segment_targeting
+  st_positioning st_positioning[] // 1 to many relation with st_positioning
+}
+
+model product_services {
+  ps_id Int @id @default(autoincrement())
+  product product @relation(fields: [product_id], references: [product_id])
+  product_id Int
+  name String
+  description String
+}
+
+model product_use_case {
+  puc_id Int @id @default(autoincrement())
+  product product @relation(fields: [product_id], references: [product_id])
+  product_id Int
+  logo String //  Stores the directory of logo file
+  desc String
+}
+
+model operating_model {
+  om_id Int @id @default(autoincrement())
+  product product @relation(fields: [product_id], references: [product_id])
+  product_id Int
+  partnership String
+  om_businessflow om_businessflow[]  // 1 to many relation with om_businessflow
+  om_supplier om_supplier[] // 1 to many relation with om_supplier
+  om_location om_location[] // 1 to many relation with om_location
+  om_mgtsystems om_mgtsystems[] // 1 to many relation with om_mgtsystems
+  om_information om_information[] // 1 to many relation with om_information
+}
+
+model om_businessflow {
+  ombf_id Int @id @default(autoincrement())
+  operating_model operating_model @relation(fields: [om_id], references: [om_id])
+  om_busflownode om_busflownode[] // 1 to many relation with om_busflownode
+  om_id Int // Foreign Key of operating_model
+  operator String
+}
+
+model om_supplier {
+  oms_id Int @id @default(autoincrement())
+  operating_model operating_model @relation(fields: [om_id], references: [om_id])
+  om_id Int // Foreign Key of operating_model
+  name String
+  description String
+}
+
+model om_location {
+  oml_id Int @id @default(autoincrement())
+  operating_model operating_model @relation(fields: [om_id], references: [om_id])
+  om_id Int // Foreign Key of operating_model
+  location String
+}
+
+model om_mgtsystems {
+  omms_id Int @id @default(autoincrement())
+  operating_model operating_model @relation(fields: [om_id], references: [om_id])
+  om_id Int // Foreign Key of operating_model
+  name String
+}
+
+model om_information {
+  omi_id Int @id @default(autoincrement())
+  operating_model operating_model @relation(fields: [om_id], references: [om_id])
+  om_id Int // Foreign Key of operating_model
+  scope String
+  om_infonode om_infonode[] // 1 to many relation with om_information 
+}
+
+model om_busflownode {
+  ombfn_id Int @id @default(autoincrement())
+  om_businessflow om_businessflow @relation(fields: [ombf_id], references: [ombf_id])
+  ombf_id Int // Foreign Key of om_businessflow
+  desc String
+  position Int
+}
+
+model om_infonode {
+  omin_id Int @id @default(autoincrement())
+  om_information om_information @relation(fields: [omi_id], references: [omi_id])
+  omi_id Int  // Foreign Key of om_information
+  description String
+}
+
+model segment_targeting {
+  st_id Int @id @default(autoincrement())
+  product product @relation(fields: [product_id], references: [product_id])
+  stpdb stpdb @relation(fields: [stpdb_id], references: [stpdb_id])
+  product_id Int  // Foreign Key of product
+  stpdb_id Int  // Foreign Key of stpdb
+  desc String
+  st_futuregrowth st_futuregrowth[] // 1 to many relation with st_futuregrowth 
+  st_targeting_user st_targeting_user[] // 1 to many relation with st_futuregrowth 
+}
+
+model st_positioning {
+  st_pos Int @id @default(autoincrement())
+  stpdb stpdb @relation(fields: [stpdb_id], references: [stpdb_id])
+  stpdb_id Int  // Foreign Key of stpdb
+  logo String // Store the directory of logo's file 
+  x Int // Define the coordinate position of logo (x-axis) 
+  y Int // Define the coordinate position of logo (y-axis)
+}
+
+model st_futuregrowth {
+  stfg_id Int @id @default(autoincrement())
+  segment_targeting segment_targeting @relation(fields: [st_id], references: [st_id])
+  st_id Int // Foreign Key of segment_targeting
+  user String
+}
+
+model st_targeting_user {
+  sttu_id Int @id @default(autoincrement())
+  segment_targeting segment_targeting @relation(fields: [st_id], references: [st_id])
+  st_id Int // Foreign Key of segment_targeting
+  user String
+}
