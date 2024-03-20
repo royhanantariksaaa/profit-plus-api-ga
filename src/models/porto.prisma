@@ -10,52 +10,52 @@ datasource db {
 
 // Database model mapping
 model product {
-  product_id Int @id @default(autoincrement())
-  units units @relation(fields: [unit_id], references: [unit_id])
-  taxonomy taxonomy @relation(fields: [taxonomy_id], references: [taxonomy_id])
-  category category @relation(fields: [category_id], references: [category_id])
-  category_id Int // Foreign Key of category
-  taxonomy_id Int // Foreign key of taxonomy
-  unit_id Int // Foreign key of unit
+  productId Int @id @default(autoincrement())
+  units units @relation(fields: [unitId], references: [unitId])
+  taxonomy taxonomy @relation(fields: [taxonomyId], references: [taxonomyId])
+  category category @relation(fields: [categoryId], references: [categoryId])
+  categoryId Int // Foreign Key of category
+  taxonomyId Int // Foreign key of taxonomy
+  unitId Int // Foreign key of unit
   year Int
   name String
   branding String // store the directory of branding file
-  evidence_tariff String // Store the directory of tariff file
-  evidence_product String // Store the directory of product's evidence file
+  evidenceTariff String // Store the directory of tariff file
+  evidenceProduct String // Store the directory of product's evidence file
   playbook String // Store the directory of product's playbook file
-  product_profile String
+  productProfile String
   isActive Boolean
   progressEnum progressEnum @default(aquisition)
   stpdb stpdb[] // 1 to many relation with stpdb
-  product_services product_services[] // 1 to many relation with product_services
-  product_use_case product_use_case[] // 1 to many relation with product_use_case
-  operating_model operating_model[] // 1 to many relation with operating_model
-  segment_targeting segment_targeting[] // 1 to many relation with segment_targeting
+  productServices productServices[] // 1 to many relation with productServices
+  productUseCase productUseCase[] // 1 to many relation with productUseCase
+  operatingModel operatingModel[] // 1 to many relation with operatingModel
+  segmentTargeting segmentTargeting[] // 1 to many relation with segmentTargeting
 }
 
 model units {
-  unit_id Int @id @default(autoincrement())
+  unitId Int @id @default(autoincrement())
   users users[] // 1 to many relation with users
-  unit_leader unit_leader?  // 1 to 1 relation with unit_leader
+  unitLeader unitLeader?  // 1 to 1 relation with unitLeader
   product product[] // 1 to many relation with product
-  name String
+  name String @unique
 }
 
 model users {
-  user_id Int @id @default(autoincrement())
-  unit_leader unit_leader?  // 1 to 1 relation with unit_leader
-  units units @relation(fields: [unit_id], references: [unit_id])
-  unit_id Int // foreign key of units
-  levels levels @relation(fields: [level_id], references: [level_id]) // foreign key of levels
-  level_id Int  // foreign key of levels
-  login_credentials login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id])
-  login_credentials_id String @unique // foreign key of login_credentials
-  teams teams @relation(fields: [team_id], references: [team_id])
-  team_id Int //  Foreign key of teams
+  userId Int @id @default(autoincrement())
+  unitLeader unitLeader?  // 1 to 1 relation with unitLeader
+  units units @relation(fields: [unitId], references: [unitId])  // 1 to 1 relation with units
+  levels levels @relation(fields: [levelId], references: [levelId]) // 1 to 1 relation with levels
+  loginCredentials loginCredentials @relation(fields: [loginCredentialsId], references: [loginCredentialsId]) // 1 to 1 relation with loginCredentials
+  teams teams @relation(fields: [teamId], references: [teamId]) // 1 to 1 relation with teams
+  unitId Int // foreign key of units
+  levelId Int  // foreign key of levels
+  loginCredentialsId String @unique // foreign key of loginCredentials
+  teamId Int //  Foreign key of teams
 }
 
-model login_credentials {
-  login_credentials_id String @id @default(uuid())
+model loginCredentials {
+  loginCredentialsId String @id @default(uuid())
   users users?
   RefreshToken RefreshToken[]
   email String
@@ -63,49 +63,49 @@ model login_credentials {
 }
 
 model teams {
-  team_id Int @id @default(autoincrement())
+  teamId Int @id @default(autoincrement())
   users users[]  //   1 to many relation with users
-  team_name String @unique
+  teamName String @unique
 }
 
 model RefreshToken {
   id String @id @unique @default(uuid())
   hashedToken String
   userId String
-  login_credentials login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
-  login_credentials_id String
+  loginCredentials loginCredentials @relation(fields: [loginCredentialsId], references: [loginCredentialsId], onDelete: Cascade)
+  loginCredentialsId String
   revoked Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-// Add new entity named unit_leader
-model unit_leader {
-  leader_id Int @id @default(autoincrement())
-  users users @relation(fields: [user_id], references: [user_id])
-  units units @relation(fields: [unit_id], references: [unit_id])
-  user_id Int @unique //  Foreign key of user
-  unit_id Int @unique // Foreign key of unit
+// Add new entity named unitLeader
+model unitLeader {
+  leaderId Int @id @default(autoincrement())
+  users users @relation(fields: [userId], references: [userId])
+  units units @relation(fields: [unitId], references: [unitId])
+  userId Int @unique //  Foreign key of user
+  unitId Int @unique // Foreign key of unit
 }
 
 model levels {
-  level_id Int @id @default(autoincrement())
+  levelId Int @id @default(autoincrement())
   users users[]
   name String @unique
 }
 
 model taxonomy {
-  taxonomy_id Int @id @default(autoincrement())
+  taxonomyId Int @id @default(autoincrement())
   product product[] // 1 to many relation with product
   name String
-  taxonomy_desc String
+  taxonomyDesc String
 }
 
 model category {
-  category_id Int @id @default(autoincrement())
+  categoryId Int @id @default(autoincrement())
   product product[] // 1 to many relation with product
   name String
-  category_desc String
+  categoryDesc String
 }
 
 enum progressEnum {
@@ -117,143 +117,143 @@ enum progressEnum {
 }
 
 model differentiation {
-  dif_id Int @id @default(autoincrement())
-  dif_enabler_collection dif_enabler_collection[] //  1 to many relation with dif_enabler_collection
+  difId Int @id @default(autoincrement())
+  difEnablerCollection difEnablerCollection[] //  1 to many relation with difEnablerCollection
   stpdb stpdb[]
   content String
   context String
 }
 
-model dif_enabler_collection {
-  dif_enabler_collection_id Int @id @default(autoincrement())
-  point_description String
-  differentiation differentiation @relation(fields: [dif_id], references: [dif_id])
-  dif_id Int // Foreign Key of differentiation
+model difEnablerCollection {
+  difEnablerCollectionId Int @id @default(autoincrement())
+  pointDescription String
+  differentiation differentiation @relation(fields: [difId], references: [difId])
+  difId Int // Foreign Key of differentiation
 }
 
 model stpdb {
-  stpdb_id Int @id @default(autoincrement())
-  product product @relation(fields: [product_id], references: [product_id])
-  differentiation differentiation @relation(fields: [dif_id], references: [dif_id])
-  product_id Int //  Foreign key of product
-  dif_id Int  //  Foreign key of differentiation
+  stpdbId Int @id @default(autoincrement())
+  product product @relation(fields: [productId], references: [productId])
+  differentiation differentiation @relation(fields: [difId], references: [difId])
+  productId Int //  Foreign key of product
+  difId Int  //  Foreign key of differentiation
   branding String //  Store the directory of product's branding image
-  positioning_description String
-  segment_targeting segment_targeting[] // 1 to many relation with segment_targeting
-  st_positioning st_positioning[] // 1 to many relation with st_positioning
+  positioningDescription String
+  segmentTargeting segmentTargeting[] // 1 to many relation with segmentTargeting
+  stPositioning stPositioning[] // 1 to many relation with stPositioning
 }
 
-model product_services {
-  ps_id Int @id @default(autoincrement())
-  product product @relation(fields: [product_id], references: [product_id])
-  product_id Int
+model productServices {
+  psId Int @id @default(autoincrement())
+  product product @relation(fields: [productId], references: [productId])
+  productId Int
   name String
   description String
 }
 
-model product_use_case {
-  puc_id Int @id @default(autoincrement())
-  product product @relation(fields: [product_id], references: [product_id])
-  product_id Int
+model productUseCase {
+  pucId Int @id @default(autoincrement())
+  product product @relation(fields: [productId], references: [productId])
+  productId Int
   logo String //  Stores the directory of logo file
   desc String
 }
 
-model operating_model {
-  om_id Int @id @default(autoincrement())
-  product product @relation(fields: [product_id], references: [product_id])
-  product_id Int
+model operatingModel {
+  omId Int @id @default(autoincrement())
+  product product @relation(fields: [productId], references: [productId])
+  productId Int
   partnership String
-  om_businessflow om_businessflow[]  // 1 to many relation with om_businessflow
-  om_supplier om_supplier[] // 1 to many relation with om_supplier
-  om_location om_location[] // 1 to many relation with om_location
-  om_mgtsystems om_mgtsystems[] // 1 to many relation with om_mgtsystems
-  om_information om_information[] // 1 to many relation with om_information
+  omBusinessFlow omBusinessFlow[]  // 1 to many relation with omBusinessflow
+  omSupplier omSupplier[] // 1 to many relation with omSupplier
+  omLocation omLocation[] // 1 to many relation with omLocation
+  omMgtSystems omMgtSystems[] // 1 to many relation with omMgtsystems
+  omInformation omInformation[] // 1 to many relation with omInformation
 }
 
-model om_businessflow {
-  ombf_id Int @id @default(autoincrement())
-  operating_model operating_model @relation(fields: [om_id], references: [om_id])
-  om_busflownode om_busflownode[] // 1 to many relation with om_busflownode
-  om_id Int // Foreign Key of operating_model
+model omBusinessFlow {
+  ombfId Int @id @default(autoincrement())
+  operatingModel operatingModel @relation(fields: [omId], references: [omId])
+  omBusFlowNode omBusFlowNode[] // 1 to many relation with omBusFlowNode
+  omId Int // Foreign Key of operatingModel
   operator String
 }
 
-model om_supplier {
-  oms_id Int @id @default(autoincrement())
-  operating_model operating_model @relation(fields: [om_id], references: [om_id])
-  om_id Int // Foreign Key of operating_model
+model omSupplier {
+  omsId Int @id @default(autoincrement())
+  operatingModel operatingModel @relation(fields: [omId], references: [omId])
+  omId Int // Foreign Key of operatingModel
   name String
   description String
 }
 
-model om_location {
-  oml_id Int @id @default(autoincrement())
-  operating_model operating_model @relation(fields: [om_id], references: [om_id])
-  om_id Int // Foreign Key of operating_model
+model omLocation {
+  omlId Int @id @default(autoincrement())
+  operatingModel operatingModel @relation(fields: [omId], references: [omId])
+  omId Int // Foreign Key of operatingModel
   location String
 }
 
-model om_mgtsystems {
-  omms_id Int @id @default(autoincrement())
-  operating_model operating_model @relation(fields: [om_id], references: [om_id])
-  om_id Int // Foreign Key of operating_model
+model omMgtSystems {
+  ommsId Int @id @default(autoincrement())
+  operatingModel operatingModel @relation(fields: [omId], references: [omId])
+  omId Int // Foreign Key of operatingModel
   name String
 }
 
-model om_information {
-  omi_id Int @id @default(autoincrement())
-  operating_model operating_model @relation(fields: [om_id], references: [om_id])
-  om_id Int // Foreign Key of operating_model
+model omInformation {
+  omiId Int @id @default(autoincrement())
+  operatingModel operatingModel @relation(fields: [omId], references: [omId])
+  omId Int // Foreign Key of operatingModel
   scope String
-  om_infonode om_infonode[] // 1 to many relation with om_information 
+  omInfoNode omInfoNode[] // 1 to many relation with omInformation 
 }
 
-model om_busflownode {
-  ombfn_id Int @id @default(autoincrement())
-  om_businessflow om_businessflow @relation(fields: [ombf_id], references: [ombf_id])
-  ombf_id Int // Foreign Key of om_businessflow
+model omBusFlowNode {
+  ombfnId Int @id @default(autoincrement())
+  omBusinessFlow omBusinessFlow @relation(fields: [ombfId], references: [ombfId])
+  ombfId Int // Foreign Key of omBusinessFlow
   desc String
   position Int
 }
 
-model om_infonode {
-  omin_id Int @id @default(autoincrement())
-  om_information om_information @relation(fields: [omi_id], references: [omi_id])
-  omi_id Int  // Foreign Key of om_information
+model omInfoNode {
+  ominId Int @id @default(autoincrement())
+  omInformation omInformation @relation(fields: [omiId], references: [omiId])
+  omiId Int  // Foreign Key of omInformation
   description String
 }
 
-model segment_targeting {
-  st_id Int @id @default(autoincrement())
-  product product @relation(fields: [product_id], references: [product_id])
-  stpdb stpdb @relation(fields: [stpdb_id], references: [stpdb_id])
-  product_id Int  // Foreign Key of product
-  stpdb_id Int  // Foreign Key of stpdb
+model segmentTargeting {
+  stId Int @id @default(autoincrement())
+  product product @relation(fields: [productId], references: [productId])
+  stpdb stpdb @relation(fields: [stpdbId], references: [stpdbId])
+  productId Int  // Foreign Key of product
+  stpdbId Int  // Foreign Key of stpdb
   desc String
-  st_futuregrowth st_futuregrowth[] // 1 to many relation with st_futuregrowth 
-  st_targeting_user st_targeting_user[] // 1 to many relation with st_futuregrowth 
+  stFutureGrowth stFutureGrowth[] // 1 to many relation with stFutureGrowth 
+  stTargetingUser stTargetingUser[] // 1 to many relation with stTargetingUser 
 }
 
-model st_positioning {
-  st_pos Int @id @default(autoincrement())
-  stpdb stpdb @relation(fields: [stpdb_id], references: [stpdb_id])
-  stpdb_id Int  // Foreign Key of stpdb
+model stPositioning {
+  stPos Int @id @default(autoincrement())
+  stpdb stpdb @relation(fields: [stpdbId], references: [stpdbId])
+  stpdbId Int  // Foreign Key of stpdb
   logo String // Store the directory of logo's file 
   x Int // Define the coordinate position of logo (x-axis) 
   y Int // Define the coordinate position of logo (y-axis)
 }
 
-model st_futuregrowth {
-  stfg_id Int @id @default(autoincrement())
-  segment_targeting segment_targeting @relation(fields: [st_id], references: [st_id])
-  st_id Int // Foreign Key of segment_targeting
+model stFutureGrowth {
+  stfgId Int @id @default(autoincrement())
+  segmentTargeting segmentTargeting @relation(fields: [stId], references: [stId])
+  stId Int // Foreign Key of segmentTargeting
   user String
 }
 
-model st_targeting_user {
-  sttu_id Int @id @default(autoincrement())
-  segment_targeting segment_targeting @relation(fields: [st_id], references: [st_id])
-  st_id Int // Foreign Key of segment_targeting
+model stTargetingUser {
+  sttuId Int @id @default(autoincrement())
+  segmentTargeting segmentTargeting @relation(fields: [stId], references: [stId])
+  stId Int // Foreign Key of segmentTargeting
   user String
 }
