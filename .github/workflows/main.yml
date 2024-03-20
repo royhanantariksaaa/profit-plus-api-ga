@@ -27,4 +27,4 @@ jobs:
             cd ~/apps/profit-plus-api-ga
             git status
             npm install --omit=dev
-            pm2 restart src/Main.js
+            pm2 restart src/Main.js --cwd ~/apps/profit-plus-api-ga
