@@ -68,12 +68,12 @@ model product {
     updated_by            String
 
     // Atribut & relationship Porto
-    units             units               @relation(fields: [unit_id], references: [unit_id])
+    units             units               @relation(fields: [units_name], references: [units_name])
     taxonomy          taxonomy            @relation(fields: [taxonomy_id], references: [taxonomy_id])
     category          category            @relation(fields: [category_id], references: [category_id])
     category_id       Int // Foreign Key of category
     taxonomy_id       Int // Foreign key of taxonomy
-    unit_id           Int // Foreign key of unit
+    units_name        String // Foreign key of unit
     year              Int
     name              String
     branding          String // store the directory of branding file
@@ -192,48 +192,43 @@ model file {
 
 // Schema Porto
 
-// Database model mapping
-
 model units {
-    unit_id     Int          @id @default(autoincrement())
     users       users[] // 1 to many relation with users
     unit_leader unit_leader? // 1 to 1 relation with unit_leader
     product     product[] // 1 to many relation with product
-    name        String       @unique
+    units_name  String       @id @unique
 }
 
 model users {
     user_id              Int               @id @default(autoincrement())
     unit_leader          unit_leader? // 1 to 1 relation with unit_leader
-    units                units             @relation(fields: [unit_id], references: [unit_id]) // 1 to Many relation with units
-    levels               levels            @relation(fields: [level_id], references: [level_id]) // 1 to Many relation with levels
+    units                units             @relation(fields: [units_name], references: [units_name]) // 1 to Many relation with units
+    levels               levels            @relation(fields: [level_name], references: [level_name]) // 1 to Many relation with levels
     login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id]) // 1 to 1 relation with login_credentials
-    teams                teams             @relation(fields: [team_id], references: [team_id]) // 1 to Many relation with teams
-    unit_id              Int // foreign key of units
-    level_id             Int // foreign key of levels
+    teams                teams             @relation(fields: [team_name], references: [team_name]) // 1 to Many relation with teams
+    units_name           String // foreign key of units
+    level_name           String // foreign key of levels
     login_credentials_id String            @unique // foreign key of login_credentials
-    team_id              Int //  Foreign key of teams
+    team_name            String //  Foreign key of teams
 }
 
 model login_credentials {
     login_credentials_id String          @id @default(uuid())
     users                users?
     refresh_token        refresh_token[]
+    user_name            String
     email                String          @unique
     password             String
-    username             String
 }
 
 model teams {
-    team_id   Int     @id @default(autoincrement())
     users     users[] //   1 to many relation with users
-    team_name String  @unique
+    team_name String  @id @unique
 }
 
 model refresh_token {
     id                   String            @id @unique @default(uuid())
     hashed_token         String
-    user_id              String
     login_credentials    login_credentials @relation(fields: [login_credentials_id], references: [login_credentials_id], onDelete: Cascade)
     login_credentials_id String
     revoked              Boolean           @default(false)
@@ -243,17 +238,16 @@ model refresh_token {
 
 // Add new entity named unit_leader
 model unit_leader {
-    leader_id Int   @id @default(autoincrement())
-    users     users @relation(fields: [user_id], references: [user_id])
-    units     units @relation(fields: [unit_id], references: [unit_id])
-    user_id   Int   @unique //  Foreign key of user
-    unit_id   Int   @unique // Foreign key of unit
+    leader_id  Int    @id @default(autoincrement())
+    users      users  @relation(fields: [user_id], references: [user_id])
+    units      units  @relation(fields: [units_name], references: [units_name])
+    user_id    Int    @unique //  Foreign key of user
+    units_name String @unique // Foreign key of unit
 }
 
 model levels {
-    level_id Int     @id @default(autoincrement())
-    users    users[]
-    name     String  @unique
+    users      users[]
+    level_name String  @id @unique
 }
 
 model taxonomy {
@@ -326,7 +320,7 @@ model operating_model {
     product          product            @relation(fields: [product_id], references: [id])
     product_id       Int
     partnership      String
-    om_business_flow om_business_flow[] // 1 to many relation with om_businessflow
+    om_business_flow om_business_flow[] // 1 to many relation with om_business_flow
     om_supplier      om_supplier[] // 1 to many relation with om_supplier
     om_location      om_location[] // 1 to many relation with om_location
     om_mgt_systems   om_mgt_systems[] // 1 to many relation with om_mgtsystems
