@@ -18,14 +18,14 @@ jobs:
             if [ -d ~/apps/profit-plus-api-ga/.git ]; then
               echo "Repository exists, pulling changes..."
               cd ~/apps/profit-plus-api-ga
-              sudo git checkout .
-              sudo git clean -fd  # Clean untracked files and directories
-              sudo git checkout HEAD -- .  # Reset changes in tracked files
-              sudo git pull --rebase origin schema
+              git checkout .
+              git clean -fd  # Clean untracked files and directories
+              git checkout HEAD -- .  # Reset changes in tracked files
+              git pull --rebase origin schema
             else
               echo "Repository not found, cloning..."
               cd ~/apps
-              sudo git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
+              git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
             fi
             cd ~/apps/profit-plus-api-ga
             git status
