@@ -44,10 +44,10 @@ model units {
 model users {
   userId Int @id @default(autoincrement())
   unitLeader unitLeader?  // 1 to 1 relation with unitLeader
-  units units @relation(fields: [unitId], references: [unitId])  // 1 to 1 relation with units
-  levels levels @relation(fields: [levelId], references: [levelId]) // 1 to 1 relation with levels
+  units units @relation(fields: [unitId], references: [unitId])  // 1 to Many relation with units
+  levels levels @relation(fields: [levelId], references: [levelId]) // 1 to Many relation with levels
   loginCredentials loginCredentials @relation(fields: [loginCredentialsId], references: [loginCredentialsId]) // 1 to 1 relation with loginCredentials
-  teams teams @relation(fields: [teamId], references: [teamId]) // 1 to 1 relation with teams
+  teams teams @relation(fields: [teamId], references: [teamId]) // 1 to Many relation with teams
   unitId Int // foreign key of units
   levelId Int  // foreign key of levels
   loginCredentialsId String @unique // foreign key of loginCredentials
@@ -58,7 +58,7 @@ model loginCredentials {
   loginCredentialsId String @id @default(uuid())
   users users?
   RefreshToken RefreshToken[]
-  email String
+  email String @unique
   password String
 }
 
