@@ -8,9 +8,7 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-// Schema GTOMS
-
-// Define "pic" Table
+// Schema GTOM
 model pic {
     id         String   @id @default(uuid())
     name       String
@@ -21,12 +19,11 @@ model pic {
     updated_by String
 
     // Relationship
-    project_pic_external   product[]      @relation("ExternalPIC")
-    project_pic_segment    product[]      @relation("SegmentPIC")
+    project_pic_external   project[]      @relation("ExternalPIC")
+    project_pic_segment    project[]      @relation("SegmentPIC")
     project_pic_midfielder project_init[]
 }
 
-// Define "customer" Table
 model customer {
     id         String   @id @default(uuid())
     name       String
@@ -36,12 +33,11 @@ model customer {
     updated_by String
 
     // Relationship
-    project product[]
+    project project[]
 }
 
-// Define "project" Table
-model product {
-    id                    Int               @id @default(autoincrement())
+model project {
+    id                    String            @id @default(uuid())
     start_date            DateTime
     end_date              DateTime
     subscription_duration Int
@@ -62,135 +58,149 @@ model product {
     project_drop_id       String            @unique
     project_close_out     project_close_out @relation(fields: [project_close_out_id], references: [id])
     project_close_out_id  String            @unique
+    passcode              String
+    comments              comment[]
     created_at            DateTime          @default(now())
     updated_at            DateTime          @updatedAt
     created_by            String
     updated_by            String
-
-    // Atribut & relationship Porto
-    units             units               @relation(fields: [units_name], references: [units_name])
-    taxonomy          taxonomy            @relation(fields: [taxonomy_id], references: [taxonomy_id])
-    category          category            @relation(fields: [category_id], references: [category_id])
-    category_id       Int // Foreign Key of category
-    taxonomy_id       Int // Foreign key of taxonomy
-    units_name        String // Foreign key of unit
-    year              Int
-    name              String
-    branding          String // store the directory of branding file
-    evidence_tariff   String // Store the directory of tariff file
-    evidence_product  String // Store the directory of product's evidence file
-    playbook          String // Store the directory of product's playbook file
-    product_profile   String
-    is_active         Boolean
-    progress_enum     progress_enum       @default(aquisition)
-    stpdb             stpdb[]
-    product_services  product_services[]
-    product_use_case  product_use_case[]
-    operating_model   operating_model[]
-    segment_targeting segment_targeting[]
-
-    // Atribut & relationship Tarif
-    packages  packages[]
-    types     type[]
-    offerings offering[]
 }
 
-// Define "project_init" Table
 model project_init {
-    id                         String   @id @default(uuid())
-    nde_request                String // File id
+    id                         String  @id @default(uuid())
+    nde_request                String // Document id
     midfielder                 String
     related_unit               String
-    pic_midfielder             pic      @relation(fields: [pic_midfielder_id], references: [id])
+    pic_midfielder             pic     @relation(fields: [pic_midfielder_id], references: [id])
     pic_midfielder_id          String
-    mom_req                    String // File id
+    mom_req                    String // Document id
     helix                      String
-    lir_requirement            String // File id
+    lir_requirement            String // Document id
     requester                  String
     impact                     String
     potential_employee_trained Int
-    nde_determination          String // File id
+    nde_determination          String // Document id
     tariff                     Int
     potential_revenue          Int
-    created_at                 DateTime @default(now())
-    updated_at                 DateTime @updatedAt
-    created_by                 String
-    updated_by                 String
+    is_approved                Boolean
 
     // Relationship
-    project product?
+    project project?
 }
 
-// Define "project_ongoing" Table
 model project_ongoing {
-    id                  String   @id @default(uuid())
-    nde_req_cfu_to_mid  String // File id
-    nde_req_mid_to_tcuc String // File id
+    id                  String    @id @default(uuid())
+    nde_req_cfu_to_mid  String // Document id
+    nde_req_mid_to_tcuc String // Document id
     UIC                 String
-    solutions           String // Relate to "Product" Table in Porto
+    solutions           product[]
     start_access        DateTime
     end_access          DateTime
-    mom_readiness       String // File id
-    nde_confirmation    String // File id
-    baa                 String // File id
-    bast                String // File id
-    created_at          DateTime @default(now())
-    updated_at          DateTime @updatedAt
-    created_by          String
-    updated_by          String
+    mom_readiness       String // Document id
+    nde_confirmation    String // Document id
+    baa                 String // Document id
+    bast                String // Document id
+    is_approved         Boolean
 
     // Relationship
-    project product?
+    project project?
 }
 
-// Define "project_drop" Table
 model project_drop {
-    id               String   @id @default(uuid())
-    nde_project_drop String // File id
-    created_at       DateTime @default(now())
-    updated_at       DateTime @updatedAt
-    created_by       String
-    updated_by       String
+    id               String  @id @default(uuid())
+    nde_project_drop String // Document id
+    is_approved      Boolean
 
     // Relationship
-    project product?
+    project project?
 }
 
-// Define "project_close_out"
 model project_close_out {
-    id                      String   @id @default(uuid())
-    mom_reconciles          String // File id
-    nde_revenue_recognition String // File id
+    id                      String  @id @default(uuid())
+    mom_reconciles          String // Document id
+    nde_revenue_recognition String // Document id
     employee_trained        Int
     revenue_in              Int
-    report_project          String // File id
-    nde_report_project      String // File id
-    nps                     String // File id
+    report_project          String // Document id
+    nde_report_project      String // Document id
+    nps                     String // Document id
     delivery_year           String
-    created_at              DateTime @default(now())
-    updated_at              DateTime @updatedAt
-    created_by              String
-    updated_by              String
+    is_approved             Boolean
 
     // Relationship
-    project product?
+    project project?
 }
 
-// Define "file" Table
-model file {
+model document {
     id            String   @id @default(uuid())
-    original_name String // Original file name when uploaded
-    file_name     String // Renamed file after upload
+    project_id    String
+    original_name String // Original Document name when uploaded
+    document_name String // Renamed Document after upload
     document_type String // Ex: NDE Penetapan, MoM Readiness dll
     encoding      String // Ex: 7bit
-    mime_type     String // Ex: image/jpeg
+    mime_type     String // Ex: image/jpeg    
     created_at    DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    updated_at    DateTime @updatedAt
     created_by    String
     updated_by    String
 }
 
+model notification {
+    id         Int      @id @default(autoincrement())
+    user_id    String // Relate to User Table
+    sender     String // Relate to User Table
+    header     String
+    content    String
+    category   String
+    url        String
+    read       Boolean
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    created_by String
+    updated_by String
+}
+
+model comment {
+    id         Int      @id @default(autoincrement())
+    user_id    String
+    comment    String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+    created_by String
+    updated_by String
+    project    project  @relation(fields: [project_id], references: [id])
+    project_id String   @unique
+}
+
 // Schema Porto
+model product {
+    id                 Int                 @id @default(autoincrement())
+    units              units               @relation(fields: [units_name], references: [units_name])
+    taxonomy           taxonomy            @relation(fields: [taxonomy_id], references: [taxonomy_id])
+    category           category            @relation(fields: [category_id], references: [category_id])
+    category_id        Int // Foreign Key of category
+    taxonomy_id        Int // Foreign key of taxonomy
+    units_name         String // Foreign key of unit
+    year               Int
+    name               String
+    branding           String // store the directory of branding file
+    evidence_tariff    String // Store the directory of tariff file
+    evidence_product   String // Store the directory of product's evidence file
+    playbook           String // Store the directory of product's playbook file
+    product_profile    String
+    is_active          Boolean
+    progress_enum      progress_enum       @default(aquisition)
+    stpdb              stpdb[]
+    product_services   product_services[]
+    product_use_case   product_use_case[]
+    operating_model    operating_model[]
+    segment_targeting  segment_targeting[]
+    packages           packages[]
+    types              type[]
+    offerings          offering[]
+    project_ongoing    project_ongoing     @relation(fields: [project_ongoing_id], references: [id])
+    project_ongoing_id String
+}
 
 model units {
     users       users[] // 1 to many relation with users
