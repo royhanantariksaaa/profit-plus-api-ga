@@ -1,0 +1,43 @@
+name: CD
+on:
+  push:
+    branches: [ "main", "development" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: Deploy using ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST}}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT}}
+          script: |
+            if [ -d ~/apps/profit-plus-api-ga/.git ]; then
+              echo "Repository exists, pulling changes..."
+              cd ~/apps/profit-plus-api-ga
+              git checkout .
+              git clean -fd  # Clean untracked files and directories
+              git checkout HEAD -- .  # Reset changes in tracked files
+              git pull --rebase origin development
+            else
+              echo "Repository not found, cloning..."
+              cd ~/apps
+              git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b development 
+            fi
+            cd ~/apps/profit-plus-api-ga
+            git status
+            npm install --omit=dev
+            prisma generate --schema=./src/models/profit.prisma
+            prisma migrate deploy --schema=./src/models/profit.prisma
+            if pm2 list | grep profitplus; then
+              echo "Process 'profitplus' already running with pm2."
+              pm2 restart 'profitplus' --update-env
+            else
+              echo "Process 'profitplus' not found with pm2."
+              pm2 start src/Main.js --name "profitplus" --update-env
+            fi
+            pm2 save
+            
