@@ -1,7 +1,7 @@
 name: CD
 on:
   push:
-    branches: [ "main", "schema" ]
+    branches: [ "main", "development" ]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,11 +21,11 @@ jobs:
               git checkout .
               git clean -fd  # Clean untracked files and directories
               git checkout HEAD -- .  # Reset changes in tracked files
-              git pull --rebase origin schema
+              git pull --rebase origin development
             else
               echo "Repository not found, cloning..."
               cd ~/apps
-              git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b schema 
+              git clone https://github.com/royhanantariksaaa/profit-plus-api-ga.git -b development 
             fi
             cd ~/apps/profit-plus-api-ga
             git status
