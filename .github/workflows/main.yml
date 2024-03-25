@@ -30,8 +30,8 @@ jobs:
             cd ~/apps/profit-plus-api-ga
             git status
             npm install --omit=dev
-            prisma generate --schema=./src/models/profit.prisma
-            prisma migrate deploy --schema=./src/models/profit.prisma
+            sudo prisma generate --schema=./src/models/profit.prisma
+            sudo prisma migrate deploy --schema=./src/models/profit.prisma
             if pm2 list | grep profitplus; then
               echo "Process 'profitplus' already running with pm2."
               pm2 restart 'profitplus' --update-env
