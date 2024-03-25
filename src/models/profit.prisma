@@ -5,7 +5,8 @@ generator client {
 
 datasource db {
     provider = "mysql"
-    url      = "mysql://{$env('DB_USERNAME')}:{$env('DB_PASSWORD')}@{$env('DB_HOST')}:{$env('DB_PORT')}/testprisma"
+    // url      = "mysql://"{$env('DB_USERNAME')}:{$env('DB_PASSWORD')}@{$env('DB_HOST')}:{$env('DB_PORT')}/testprisma"
+    url     = "mysql://profitplus:profitplus@localhost:3306/testprisma"
 }
 
 // Schema GTOM
